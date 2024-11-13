@@ -6,7 +6,6 @@ import { getUsers } from '@/services/user.service';
 import User from '@/types/user';
 
 
-
 export default async function Home() {
   const users = await getUsers();
   

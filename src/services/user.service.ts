@@ -1,32 +1,15 @@
-import connection from "@/configs/database";
-import { MysqlError } from "mysql";
+import pool from "@/configs/database";
 import User from "@/types/user";
+import { RowDataPacket } from "mysql2";
 
-const getUsers = async () => {
-    return new Promise<User[]>((resolve, reject) => {
-        try {
-          connection.connect();
-          connection.query(
-            "select * from users",
-            function (error: MysqlError, results: User[]) {
-                if (error) {
-                    console.log("Mysql Error: ", error.sqlMessage);
-                    reject(error.message)
-                    connection.end();
-                    }
+const getUsers = async (): Promise<User[]> => {
+    try {
+        const [rows] = await pool.query<RowDataPacket[]>("SELECT * FROM users");
+        return rows as User[]; 
+    } catch (error) {
+        console.error("Database error:", error);
+        throw new Error("Failed to fetch users");
+    }
+};
 
-                    resolve(results)
-                }
-            );
-            connection.end();
-        } catch {
-            connection.end()
-        }
-    })
-}
-
-const insertUser = async () => {
-
-}
-
- export { getUsers }
+export { getUsers };
